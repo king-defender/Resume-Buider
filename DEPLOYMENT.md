@@ -19,24 +19,39 @@ This guide covers the deployment strategy, security measures, privacy compliance
 
 #### Container Structure
 ```yaml
+# docker-compose.yml - JavaScript-First Stack
 services:
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.react
     ports:
       - "3000:3000"
     environment:
       - REACT_APP_API_URL=http://backend:5000
+      - NODE_ENV=production
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
   
   backend:
-    build: ./backend
+    build:
+      context: ./backend  
+      dockerfile: Dockerfile.nodejs
     ports:
       - "5000:5000"
     environment:
+      - NODE_ENV=production
       - DATABASE_URL=postgresql://user:pass@db:5432/resumebuilder
       - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       - db
       - redis
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
   
   db:
     image: postgres:15
@@ -46,6 +61,7 @@ services:
       - POSTGRES_PASSWORD=secure_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
   
   redis:
     image: redis:7-alpine
@@ -56,6 +72,51 @@ services:
 volumes:
   postgres_data:
   redis_data:
+```
+
+#### JavaScript-Specific Dockerfiles
+
+**Frontend Dockerfile (Dockerfile.react):**
+```dockerfile
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --only=production
+
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+**Backend Dockerfile (Dockerfile.nodejs):**
+```dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm ci --only=production
+
+# Copy source code
+COPY . .
+
+# Build TypeScript
+RUN npm run build
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodejs -u 1001
+USER nodejs
+
+EXPOSE 5000
+CMD ["node", "dist/index.js"]
 ```
 
 #### Deployment Commands

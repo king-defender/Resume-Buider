@@ -6,13 +6,26 @@ The AI-Powered Resume Builder follows a modular, plug-and-play architecture desi
 
 ## Core Architecture Principles
 
-### 1. Modular Design
+### 1. JavaScript-First Technology Principle
+- **Unified Language Stack**: JavaScript/TypeScript across all system components for consistency and developer efficiency
+- **Ecosystem Leverage**: Utilize the rich npm ecosystem and modern JavaScript tooling
+- **Team Efficiency**: Single language expertise reduces complexity and accelerates development
+- **Exception Justification**: Non-JavaScript technologies only when they provide demonstrable superior value
+- **Modern Standards**: ES2022+ features, TypeScript for type safety, and latest Node.js LTS
+
+**Technology Selection Guidelines:**
+- **Default Choice**: JavaScript/TypeScript for all new modules
+- **Justified Exceptions**: Document specific advantages when using other languages
+- **Integration Pattern**: Non-JS services must provide REST/GraphQL APIs for seamless integration
+- **Microservice Policy**: External services in other languages acceptable only for specialized tasks
+
+### 2. Modular Design
 - **Separation of Concerns**: Each AI service handles specific tasks
 - **Plug-and-Play**: Easy integration and replacement of AI modules
 - **Tight Integration**: Seamless data flow between core components
 - **Scalable**: Horizontal scaling for increased demand
 
-### 2. AI-First Approach
+### 3. AI-First Approach
 - **Multi-AI Integration**: Leverage strengths of different AI providers
 - **Intelligent Routing**: Route tasks to most suitable AI based on capability
 - **Fallback Mechanisms**: Redundancy for critical operations
@@ -36,18 +49,18 @@ The AI-Powered Resume Builder follows a modular, plug-and-play architecture desi
 
 ### Input Processing Layer
 - **Document Parsers**
-  - DOCX reader
-  - PDF extractor
-  - Template parser
-  - Text processor
+  - **DOCX reader**: `mammoth.js` for content extraction, `docx` for parsing
+  - **PDF extractor**: `pdf-parse` or `pdf2pic` for text extraction
+  - **Template parser**: `handlebars` or `mustache` for dynamic templates
+  - **Text processor**: Native JavaScript string processing with `natural` for NLP
 - **Link Handlers**
-  - URL content extraction
-  - Metadata parsing
-  - Content validation
+  - **URL content extraction**: `cheerio` for HTML parsing, `metascraper` for metadata
+  - **Content validation**: `joi` or `zod` for schema validation
+  - **HTTP requests**: `axios` or native `fetch` with timeout handling
 - **Batch Processor**
-  - Multi-file handling
-  - Queue management
-  - Progress tracking
+  - **Multi-file handling**: `multer` for uploads, `stream` API for processing
+  - **Queue management**: `bull` (Redis-based) or `agenda` (MongoDB-based)
+  - **Progress tracking**: WebSocket with `socket.io` for real-time updates
 
 ### AI Orchestration Layer
 - **Task Router**: Directs tasks to appropriate AI services
@@ -56,10 +69,16 @@ The AI-Powered Resume Builder follows a modular, plug-and-play architecture desi
 - **Error Handler**: Manages AI service failures and retries
 
 ### Output Generation Layer
-- **Template Engine**: Applies formatting to generated content
-- **Format Converter**: Exports to DOC, PDF, and other formats
-- **Preview Generator**: Creates real-time preview updates
-- **Cloud Integration**: Direct upload to Google Drive and other services
+- **Template Engine**: `handlebars` or `mustache` for dynamic resume formatting
+- **Format Converter**: 
+  - **DOC/DOCX**: `docx` library for document generation
+  - **PDF**: `puppeteer` (HTML to PDF) or `pdf-lib` (direct PDF creation)
+  - **HTML**: Native template literals or JSX rendering
+- **Preview Generator**: React components with `react-pdf` for real-time preview
+- **Cloud Integration**: 
+  - **Google Drive**: `googleapis` JavaScript SDK
+  - **OneDrive**: Microsoft Graph JavaScript SDK
+  - **Dropbox**: `dropbox` JavaScript SDK
 
 ## Data Flow Architecture
 
@@ -81,18 +100,42 @@ Processed Data → Template Application → Format Conversion → User Delivery
 ## Technical Specifications
 
 ### Backend Architecture
-- **Runtime**: Node.js with TypeScript
-- **Framework**: Express.js or FastAPI
+- **Runtime**: Node.js LTS with TypeScript for type safety
+- **Framework**: Express.js (mature ecosystem) or Fastify (high performance)
+- **Database ORM**: Prisma (modern, type-safe) or TypeORM (decorator-based)
+- **Document Processing**: 
+  - **DOCX**: `docx` library for creation, `mammoth.js` for parsing
+  - **PDF**: `pdf-lib` for manipulation, `pdf2pic` for conversion
+  - **Templates**: `handlebars` or `mustache` for dynamic content
 - **Database**: PostgreSQL for user data, Redis for caching
-- **Message Queue**: Redis/RabbitMQ for AI task management
-- **File Storage**: S3-compatible storage for documents
+- **Message Queue**: Bull (Redis-based) or Agenda (MongoDB-based) for AI task management
+- **File Storage**: AWS SDK for JavaScript (S3-compatible storage)
+- **Validation**: Zod or Joi for runtime type checking
+- **Testing**: Jest with SuperTest for API testing
+
+**JavaScript Library Selections:**
+- **HTTP Client**: Axios or native fetch for AI service communication
+- **Authentication**: jsonwebtoken for JWT handling
+- **Encryption**: crypto (Node.js built-in) with bcrypt for passwords
+- **Configuration**: dotenv with joi for environment validation
+- **Logging**: winston or pino for structured logging
 
 ### Frontend Architecture
-- **Framework**: React with TypeScript
-- **State Management**: Redux Toolkit or Zustand
-- **UI Library**: Material-UI or Chakra UI
-- **Real-time Updates**: WebSocket for live preview
-- **PWA Support**: Service workers for offline capability
+- **Framework**: React 18+ with TypeScript and modern hooks
+- **Bundler**: Vite (fast builds) or Next.js (full-stack features)
+- **State Management**: Zustand (lightweight) or Redux Toolkit (complex state)
+- **UI Library**: 
+  - **Option 1**: Chakra UI (simple, accessible)
+  - **Option 2**: Material-UI (comprehensive components)
+  - **Option 3**: Tailwind CSS with Headless UI (maximum customization)
+- **Real-time Updates**: Socket.io client for live preview
+- **File Handling**: File API with drag-and-drop support
+- **PDF Preview**: react-pdf for document preview
+- **Forms**: React Hook Form with Zod validation
+- **Routing**: React Router (SPA) or Next.js router (SSR)
+- **PWA Support**: Workbox for service workers and offline capability
+- **Testing**: React Testing Library with Jest
+- **Build Tools**: ESBuild or SWC for fast compilation
 
 ### Security Architecture
 - **Authentication**: JWT with refresh tokens
@@ -151,6 +194,39 @@ Processed Data → Template Application → Format Conversion → User Delivery
 - **Log Levels**: Error, warn, info, debug
 - **Centralized Logging**: ELK stack or similar
 - **Privacy Compliance**: No PII in logs
+
+## Technology Selection & Exceptions
+
+### JavaScript-First Implementation
+The system prioritizes JavaScript/TypeScript across all components to ensure:
+- **Developer Efficiency**: Single language expertise across full stack
+- **Code Reusability**: Shared utilities and types between frontend/backend
+- **Ecosystem Benefits**: Access to npm's extensive package ecosystem
+- **Tooling Consistency**: Unified development, testing, and deployment tools
+
+### Justified Non-JavaScript Components
+
+#### Database Layer
+- **PostgreSQL**: Relational database for complex data relationships
+- **Redis**: In-memory caching for performance optimization
+- **Justification**: While JavaScript databases exist (MongoDB), PostgreSQL provides superior ACID compliance and complex query capabilities essential for user data integrity
+
+#### Infrastructure Services
+- **Docker**: Containerization for consistent deployment
+- **Kubernetes**: Container orchestration for scalability
+- **Justification**: Industry-standard infrastructure tools with no JavaScript equivalents
+
+#### Optional AI Microservices
+- **Python-based AI services**: For specialized ML models not available in JavaScript
+- **Justification**: Only when JavaScript AI libraries cannot provide equivalent functionality
+- **Integration**: Must expose REST/GraphQL APIs for seamless JavaScript integration
+- **Examples**: Custom NLP models, computer vision processing, or specialized document analysis
+
+### Migration Strategy
+- **Legacy Services**: Gradual migration of any existing non-JavaScript services
+- **API-First**: All non-JavaScript services must provide well-documented APIs
+- **Monitoring**: Performance comparison between JavaScript and alternative implementations
+- **Documentation**: Clear justification required for any future non-JavaScript additions
 
 ## Scalability Plan
 

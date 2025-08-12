@@ -6,6 +6,20 @@ The AI-Powered Resume Builder leverages a diverse ecosystem of AI services, each
 
 ## Core AI Philosophy
 
+### JavaScript-First Integration Approach
+All AI service integrations prioritize JavaScript/TypeScript implementations:
+- **Native SDKs**: Use official JavaScript SDKs when available (OpenAI, Anthropic, etc.)
+- **REST API Clients**: Implement JavaScript wrappers for services without native SDKs
+- **Type Safety**: TypeScript interfaces for all AI service responses
+- **Error Handling**: Consistent JavaScript error patterns across all integrations
+- **Testing**: Jest-based testing for all AI service interactions
+
+**Exception Policy**: Python-based AI services are acceptable only when:
+1. No equivalent JavaScript library exists
+2. Significant performance benefits are demonstrated
+3. The service provides a well-documented REST API
+4. Integration complexity is justified by unique capabilities
+
 ### Best-in-Class Selection
 Each AI service is chosen based on specific strengths:
 - **Research Excellence**: Deep analysis and information gathering
@@ -39,12 +53,37 @@ Each AI service is chosen based on specific strengths:
 
 **Integration Details:**
 ```javascript
-// Example usage pattern
+// Example usage pattern with OpenAI JavaScript SDK
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 const chatGPTOptimizer = {
   model: "gpt-4-turbo",
   temperature: 0.3,
-  maxTokens: 2000,
-  systemPrompt: "Professional resume optimization specialist"
+  max_tokens: 2000,
+  
+  async optimizeResume(content, jobDescription) {
+    const response = await openai.chat.completions.create({
+      model: this.model,
+      messages: [
+        {
+          role: "system",
+          content: "You are a professional resume optimization specialist."
+        },
+        {
+          role: "user", 
+          content: `Optimize this resume for the job description:\n\nResume: ${content}\n\nJob: ${jobDescription}`
+        }
+      ],
+      temperature: this.temperature,
+      max_tokens: this.max_tokens
+    });
+    
+    return response.choices[0].message.content;
+  }
 }
 ```
 
@@ -75,15 +114,73 @@ const chatGPTOptimizer = {
 - Technical writing assistance
 
 **Specialized Functions:**
-```python
-# Technical skill extraction
-def analyze_technical_profile(github_url):
-    return {
-        'languages': extract_languages(),
-        'frameworks': identify_frameworks(),
-        'contributions': analyze_contributions(),
-        'project_complexity': score_projects()
+```javascript
+// Technical skill extraction using GitHub API
+import { Octokit } from '@octokit/rest';
+
+class GitHubAnalyzer {
+  constructor(token) {
+    this.octokit = new Octokit({ auth: token });
+  }
+
+  async analyzeTechnicalProfile(username) {
+    try {
+      const { data: user } = await this.octokit.users.getByUsername({ username });
+      const { data: repos } = await this.octokit.repos.listForUser({ 
+        username, 
+        sort: 'updated',
+        per_page: 100 
+      });
+
+      return {
+        languages: await this.extractLanguages(repos),
+        frameworks: this.identifyFrameworks(repos),
+        contributions: await this.analyzeContributions(username),
+        projectComplexity: this.scoreProjects(repos)
+      };
+    } catch (error) {
+      console.error('GitHub analysis failed:', error);
+      throw error;
     }
+  }
+
+  async extractLanguages(repos) {
+    const languageMap = new Map();
+    
+    for (const repo of repos) {
+      const { data: languages } = await this.octokit.repos.listLanguages({
+        owner: repo.owner.login,
+        repo: repo.name
+      });
+      
+      Object.entries(languages).forEach(([lang, bytes]) => {
+        languageMap.set(lang, (languageMap.get(lang) || 0) + bytes);
+      });
+    }
+    
+    return Array.from(languageMap.entries())
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10);
+  }
+
+  identifyFrameworks(repos) {
+    const frameworks = new Set();
+    
+    repos.forEach(repo => {
+      const description = repo.description?.toLowerCase() || '';
+      const topics = repo.topics || [];
+      
+      // Framework detection logic
+      ['react', 'vue', 'angular', 'express', 'fastify', 'next.js'].forEach(framework => {
+        if (description.includes(framework) || topics.includes(framework)) {
+          frameworks.add(framework);
+        }
+      });
+    });
+    
+    return Array.from(frameworks);
+  }
+}
 ```
 
 ### 3. Notion AI
@@ -144,17 +241,93 @@ def analyze_technical_profile(github_url):
 - Automated quality assurance
 
 **Architecture Integration:**
-```python
-# LangChain workflow example
-from langchain import Chain, Memory
+```javascript
+// LangChain workflow example using LangChain.js
+import { 
+  ChatOpenAI,
+  PromptTemplate,
+  LLMChain,
+  SequentialChain
+} from 'langchain';
+import { DocumentLoaders } from 'langchain/document_loaders';
+import { TextSplitter } from 'langchain/text_splitter';
 
-resume_optimization_chain = Chain([
-    DocumentLoader(),
-    ContentAnalyzer(),
-    OptimizationEngine(),
-    QualityValidator(),
-    OutputFormatter()
-])
+class ResumeOptimizationChain {
+  constructor() {
+    this.llm = new ChatOpenAI({
+      temperature: 0.3,
+      modelName: 'gpt-4-turbo'
+    });
+  }
+
+  async createOptimizationChain() {
+    // Document analysis step
+    const analysisPrompt = PromptTemplate.fromTemplate(`
+      Analyze this resume content for improvements:
+      Resume: {resume_content}
+      Job Description: {job_description}
+      
+      Provide structured analysis:
+    `);
+
+    const analysisChain = new LLMChain({
+      llm: this.llm,
+      prompt: analysisPrompt,
+      outputKey: 'analysis'
+    });
+
+    // Content optimization step
+    const optimizationPrompt = PromptTemplate.fromTemplate(`
+      Based on this analysis: {analysis}
+      
+      Optimize the resume content:
+      Original: {resume_content}
+      
+      Provide optimized version:
+    `);
+
+    const optimizationChain = new LLMChain({
+      llm: this.llm,
+      prompt: optimizationPrompt,
+      outputKey: 'optimized_content'
+    });
+
+    // Quality validation step
+    const validationPrompt = PromptTemplate.fromTemplate(`
+      Validate this optimized resume:
+      Content: {optimized_content}
+      Original Analysis: {analysis}
+      
+      Score and provide feedback:
+    `);
+
+    const validationChain = new LLMChain({
+      llm: this.llm,
+      prompt: validationPrompt,
+      outputKey: 'validation'
+    });
+
+    // Combine into sequential chain
+    return new SequentialChain({
+      chains: [analysisChain, optimizationChain, validationChain],
+      inputVariables: ['resume_content', 'job_description'],
+      outputVariables: ['analysis', 'optimized_content', 'validation']
+    });
+  }
+
+  async processResume(resumeContent, jobDescription) {
+    const chain = await this.createOptimizationChain();
+    
+    return await chain.call({
+      resume_content: resumeContent,
+      job_description: jobDescription
+    });
+  }
+}
+
+// Usage
+const optimizer = new ResumeOptimizationChain();
+const result = await optimizer.processResume(resume, jobDesc);
 ```
 
 ### 6. Autogen (Microsoft)
@@ -260,17 +433,61 @@ Workflow          | LangChain       | Custom Logic    | Quality gates
 ### API Management
 
 #### Rate Limiting & Quotas
-```yaml
-ai_service_limits:
-  chatgpt:
-    requests_per_minute: 60
-    tokens_per_day: 100000
-  github_copilot:
-    requests_per_minute: 30
-    analysis_per_day: 1000
-  perplexity:
-    searches_per_minute: 20
-    research_per_day: 500
+```javascript
+// AI service rate limiting configuration
+const aiServiceLimits = {
+  chatgpt: {
+    requestsPerMinute: 60,
+    tokensPerDay: 100000,
+    maxConcurrency: 5
+  },
+  githubCopilot: {
+    requestsPerMinute: 30,
+    analysisPerDay: 1000,
+    maxConcurrency: 3
+  },
+  perplexity: {
+    searchesPerMinute: 20,
+    researchPerDay: 500,
+    maxConcurrency: 2
+  }
+};
+
+// Rate limiter implementation using Redis
+import Redis from 'ioredis';
+import { RateLimiterRedis } from 'rate-limiter-flexible';
+
+class AIServiceRateLimiter {
+  constructor() {
+    this.redis = new Redis(process.env.REDIS_URL);
+    this.limiters = this.createLimiters();
+  }
+
+  createLimiters() {
+    const limiters = {};
+    
+    Object.entries(aiServiceLimits).forEach(([service, config]) => {
+      limiters[service] = new RateLimiterRedis({
+        storeClient: this.redis,
+        keyPrefix: `ai_rate_limit_${service}`,
+        points: config.requestsPerMinute,
+        duration: 60,
+        blockDuration: 60
+      });
+    });
+    
+    return limiters;
+  }
+
+  async checkLimit(service, userId) {
+    try {
+      await this.limiters[service].consume(userId);
+      return true;
+    } catch (rejRes) {
+      throw new Error(`Rate limit exceeded for ${service}. Retry after ${rejRes.msBeforeNext}ms`);
+    }
+  }
+}
 ```
 
 #### Error Handling
@@ -289,21 +506,87 @@ ai_service_limits:
 
 #### Metrics Tracking
 ```javascript
-const aiMetrics = {
-  responseTime: {
-    p50: 1.2, // seconds
-    p95: 3.8,
-    p99: 8.1
-  },
-  accuracyScores: {
-    contentQuality: 0.94,
-    keywordMatch: 0.89,
-    grammarCheck: 0.97
-  },
-  userSatisfaction: {
-    overallRating: 4.6,
-    recommendationRate: 0.92
+// AI performance monitoring implementation
+import { createPrometheusMetrics } from 'prom-client';
+
+class AIMetricsCollector {
+  constructor() {
+    this.metrics = {
+      responseTime: new Histogram({
+        name: 'ai_service_response_time_seconds',
+        help: 'AI service response time in seconds',
+        labelNames: ['service', 'operation'],
+        buckets: [0.1, 0.5, 1, 2, 5, 10]
+      }),
+      
+      accuracyScores: new Gauge({
+        name: 'ai_accuracy_score',
+        help: 'AI service accuracy score',
+        labelNames: ['service', 'metric_type']
+      }),
+      
+      userSatisfaction: new Gauge({
+        name: 'user_satisfaction_rating',
+        help: 'User satisfaction rating',
+        labelNames: ['feature', 'rating_type']
+      }),
+      
+      errorRate: new Counter({
+        name: 'ai_service_errors_total',
+        help: 'Total AI service errors',
+        labelNames: ['service', 'error_type']
+      })
+    };
   }
+
+  trackResponseTime(service, operation, duration) {
+    this.metrics.responseTime
+      .labels(service, operation)
+      .observe(duration);
+  }
+
+  updateAccuracyScore(service, metricType, score) {
+    this.metrics.accuracyScores
+      .labels(service, metricType)
+      .set(score);
+  }
+
+  recordError(service, errorType) {
+    this.metrics.errorRate
+      .labels(service, errorType)
+      .inc();
+  }
+
+  async getMetricsSummary() {
+    return {
+      responseTime: {
+        p50: 1.2, // seconds
+        p95: 3.8,
+        p99: 8.1
+      },
+      accuracyScores: {
+        contentQuality: 0.94,
+        keywordMatch: 0.89,
+        grammarCheck: 0.97
+      },
+      userSatisfaction: {
+        overallRating: 4.6,
+        recommendationRate: 0.92
+      }
+    };
+  }
+}
+
+// Usage example
+const metricsCollector = new AIMetricsCollector();
+
+// Track AI service call
+const start = Date.now();
+try {
+  const result = await aiService.processRequest(data);
+  metricsCollector.trackResponseTime('chatgpt', 'resume_optimization', (Date.now() - start) / 1000);
+} catch (error) {
+  metricsCollector.recordError('chatgpt', error.type);
 }
 ```
 
