@@ -598,22 +598,31 @@ try {
 
 ## Future AI Integrations
 
+### JavaScript-First AI Module Development
+**New AI Service Integration Guidelines:**
+1. **Primary Requirement**: Use official JavaScript/TypeScript SDKs when available
+2. **Fallback Option**: Create JavaScript wrapper for REST APIs
+3. **Last Resort**: Microservice with JavaScript API interface
+4. **Documentation**: All integrations must include TypeScript type definitions
+
 ### Planned Additions
 
 #### Claude (Anthropic)
 - **Constitutional AI**: Enhanced safety and alignment
-- **Long Context**: Extended conversation memory
+- **Long Context**: Extended conversation memory  
 - **Reasoning**: Advanced logical analysis
+- **JavaScript SDK**: Official Anthropic JavaScript library
 
 #### Gemini (Google)
 - **Multimodal**: Text, image, and code integration
 - **Real-time**: Live information access
 - **Integration**: Google Workspace connectivity
+- **JavaScript Implementation**: Google AI JavaScript SDK
 
 #### Specialized Models
-- **Industry-Specific**: Sector-focused AI models
-- **Language Models**: Multi-language support
-- **Domain Experts**: Specialized knowledge areas
+- **Industry-Specific**: Sector-focused AI models via JavaScript APIs
+- **Language Models**: Multi-language support with JavaScript i18n
+- **Domain Experts**: Specialized knowledge areas through REST APIs
 
 ### Research & Development
 

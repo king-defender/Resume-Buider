@@ -242,6 +242,129 @@ The system prioritizes JavaScript/TypeScript across all components to ensure:
 - **Caching Enhancement**: Multi-level caching strategy
 - **AI Optimization**: Batch processing, model optimization
 
+## Future Technology Selection Guidelines
+
+### Decision Framework for New Modules
+When adding new components or features to the system, follow this decision hierarchy:
+
+#### 1. JavaScript-First Evaluation
+**Default Choice**: Always evaluate JavaScript/TypeScript solutions first
+- Check npm ecosystem for existing libraries
+- Assess performance characteristics
+- Consider maintenance and team expertise
+- Evaluate long-term support and community
+
+**Example Decision Process:**
+```javascript
+// Technology selection checklist
+const evaluateNewModule = {
+  jsLibraryExists: true,           // First priority
+  performanceAdequate: true,       // Meets requirements
+  teamExpertise: 'high',           // Development efficiency
+  communitySupport: 'active',      // Long-term viability
+  licenseCompatible: true,         // Legal compliance
+  
+  decision: 'USE_JAVASCRIPT'       // Proceed with JS solution
+}
+```
+
+#### 2. Exception Criteria
+**Non-JavaScript technologies are acceptable only when:**
+
+1. **Performance Critical**: Demonstrable performance benefits (>2x improvement)
+2. **Unique Capabilities**: No JavaScript equivalent exists
+3. **Industry Standard**: Required for compliance or integration
+4. **Cost Effectiveness**: Significant development time savings (>50%)
+
+**Exception Documentation Required:**
+- Detailed performance comparison
+- Alternative evaluation summary
+- Integration complexity assessment
+- Maintenance impact analysis
+
+#### 3. Integration Requirements
+**All non-JavaScript services must:**
+- Provide REST or GraphQL APIs
+- Include comprehensive documentation
+- Support JSON data exchange
+- Implement proper error handling
+- Follow service isolation principles
+
+### Technology Review Process
+
+#### Regular Assessment Schedule
+- **Monthly**: Review new JavaScript libraries and tools
+- **Quarterly**: Assess performance of non-JavaScript components
+- **Annually**: Comprehensive technology stack review
+
+#### Performance Benchmarks
+```javascript
+const performanceThresholds = {
+  apiResponseTime: {
+    target: '<200ms',
+    warning: '200-500ms',
+    critical: '>500ms'
+  },
+  
+  buildTime: {
+    target: '<30s',
+    warning: '30-60s',
+    critical: '>60s'
+  },
+  
+  bundleSize: {
+    target: '<500KB',
+    warning: '500KB-1MB',
+    critical: '>1MB'
+  }
+};
+
+// Automated monitoring
+const monitorPerformance = async () => {
+  const metrics = await collectMetrics();
+  const violations = checkThresholds(metrics, performanceThresholds);
+  
+  if (violations.length > 0) {
+    triggerReview(violations);
+  }
+};
+```
+
+#### Migration Strategy
+**For existing non-JavaScript components:**
+1. **Assessment Phase**: Evaluate JavaScript alternatives
+2. **Pilot Implementation**: Small-scale JavaScript replacement
+3. **Performance Comparison**: Measure before/after metrics
+4. **Gradual Migration**: Phase-wise replacement if beneficial
+5. **Documentation Update**: Reflect architectural changes
+
+### Best Practices
+
+#### Code Organization
+```
+project-structure/
+├── frontend/                 # React/TypeScript
+│   ├── components/
+│   ├── hooks/
+│   └── utils/
+├── backend/                  # Node.js/Express
+│   ├── controllers/
+│   ├── middleware/
+│   └── services/
+├── shared/                   # Common TypeScript types
+│   ├── types/
+│   └── validators/
+└── docs/                     # Technology decisions
+    └── tech-decisions/
+```
+
+#### Development Standards
+- **TypeScript**: Strict mode enabled for all projects
+- **Testing**: Jest for unit tests, Cypress for e2e
+- **Linting**: ESLint with strict configuration
+- **Formatting**: Prettier with consistent rules
+- **Documentation**: JSDoc for all public APIs
+
 ## Future Considerations
 
 ### Technology Evolution

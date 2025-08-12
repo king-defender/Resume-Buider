@@ -316,25 +316,134 @@ const retentionPolicy = {
 ```
 
 #### Automated Data Cleanup
-```python
-# Daily cleanup job
-def cleanup_expired_data():
-    """Remove data exceeding retention periods"""
+```javascript
+// Daily cleanup job using Node.js and cron
+import cron from 'node-cron';
+import { db } from './database.js';
+import { logger } from './logger.js';
+
+class DataCleanupService {
+  constructor() {
+    // Schedule daily cleanup at 2 AM
+    cron.schedule('0 2 * * *', () => {
+      this.cleanupExpiredData();
+    });
+  }
+
+  async cleanupExpiredData() {
+    try {
+      logger.info('Starting daily data cleanup job');
+
+      // User activity data (90 days retention)
+      await this.deleteOldActivityLogs(90);
+      
+      // Resume data for deleted accounts (90 days retention)
+      await this.deleteOrphanedResumeData(90);
+      
+      // Temporary files (24 hours retention)
+      await this.cleanupTempFiles(24);
+      
+      // AI processing cache (7 days retention)
+      await this.cleanupAiCache(7);
+      
+      // Anonymize old logs (30 days retention)
+      await this.anonymizeOldLogs(30);
+
+      logger.info('Data cleanup job completed successfully');
+    } catch (error) {
+      logger.error('Data cleanup job failed:', error);
+    }
+  }
+
+  async deleteOldActivityLogs(days) {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
     
-    # User activity data
-    delete_old_activity_logs(days=90)
+    const result = await db.query(
+      'DELETE FROM activity_logs WHERE created_at < $1',
+      [cutoffDate]
+    );
     
-    # Resume data for deleted accounts
-    delete_orphaned_resume_data(days=90)
+    logger.info(`Deleted ${result.rowCount} old activity logs`);
+  }
+
+  async deleteOrphanedResumeData(days) {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
     
-    # Temporary files
-    cleanup_temp_files(hours=24)
+    const result = await db.query(`
+      DELETE FROM resumes 
+      WHERE user_id NOT IN (SELECT id FROM users) 
+      AND updated_at < $1
+    `, [cutoffDate]);
     
-    # AI processing cache
-    cleanup_ai_cache(days=7)
+    logger.info(`Deleted ${result.rowCount} orphaned resume records`);
+  }
+
+  async cleanupTempFiles(hours) {
+    const fs = await import('fs/promises');
+    const path = await import('path');
     
-    # Anonymize old logs
-    anonymize_old_logs(days=30)
+    const tempDir = process.env.TEMP_DIR || '/tmp';
+    const cutoffTime = Date.now() - (hours * 60 * 60 * 1000);
+    
+    try {
+      const files = await fs.readdir(tempDir);
+      let deletedCount = 0;
+      
+      for (const file of files) {
+        const filePath = path.join(tempDir, file);
+        const stats = await fs.stat(filePath);
+        
+        if (stats.mtime.getTime() < cutoffTime) {
+          await fs.unlink(filePath);
+          deletedCount++;
+        }
+      }
+      
+      logger.info(`Deleted ${deletedCount} temporary files`);
+    } catch (error) {
+      logger.error('Error cleaning temp files:', error);
+    }
+  }
+
+  async cleanupAiCache(days) {
+    const Redis = await import('ioredis');
+    const redis = new Redis.default(process.env.REDIS_URL);
+    
+    const cutoffTime = Date.now() - (days * 24 * 60 * 60 * 1000);
+    const keys = await redis.keys('ai_cache:*');
+    let deletedCount = 0;
+    
+    for (const key of keys) {
+      const timestamp = await redis.hget(key, 'timestamp');
+      if (timestamp && parseInt(timestamp) < cutoffTime) {
+        await redis.del(key);
+        deletedCount++;
+      }
+    }
+    
+    logger.info(`Deleted ${deletedCount} expired AI cache entries`);
+    await redis.quit();
+  }
+
+  async anonymizeOldLogs(days) {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    
+    const result = await db.query(`
+      UPDATE system_logs 
+      SET user_id = NULL, ip_address = 'anonymized', user_agent = 'anonymized'
+      WHERE created_at < $1 AND user_id IS NOT NULL
+    `, [cutoffDate]);
+    
+    logger.info(`Anonymized ${result.rowCount} old log entries`);
+  }
+}
+
+// Initialize cleanup service
+const cleanupService = new DataCleanupService();
+export { cleanupService };
 ```
 
 ### GDPR Compliance
