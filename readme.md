@@ -47,10 +47,32 @@ The system is customizable for different user stages:
 
 ## 🛠 Technology Stack
 
-- **AI Integrations**: ChatGPT, GitHub Copilot, Notion AI, Replit, LangChain, Autogen, Grok, Perplexity
-- **Architecture**: Plug-and-play AI modules with tight integration
-- **Deployment**: Docker-first with cloud scalability
-- **Interface**: Progressive Web App with desktop/mobile support
+### JavaScript-First Architecture
+- **Frontend**: React 18+ with TypeScript, Next.js for SSR capabilities
+- **Backend**: Node.js LTS with Express.js/Fastify, TypeScript for type safety
+- **Database**: PostgreSQL with Prisma ORM, Redis for caching
+- **Document Processing**: docx.js, pdf-lib, mammoth.js for file handling
+- **AI Integration**: Official JavaScript SDKs (OpenAI, Anthropic, etc.)
+- **Testing**: Jest, React Testing Library, SuperTest for comprehensive testing
+- **Build Tools**: Vite/Next.js, ESBuild for fast compilation
+
+### AI Integrations
+- **Primary Services**: ChatGPT, GitHub Copilot, Notion AI, Replit, LangChain.js
+- **Research & Analysis**: Grok, Perplexity AI with JavaScript API clients
+- **Multi-Agent**: Autogen with JavaScript orchestration layer
+- **Architecture**: Plug-and-play modules with TypeScript interfaces
+
+### Deployment & Infrastructure
+- **Containerization**: Docker with multi-stage builds for Node.js applications
+- **Orchestration**: Kubernetes for scalability, Docker Compose for development
+- **Cloud Services**: AWS/GCP/Azure with JavaScript SDKs for service integration
+- **Monitoring**: Prometheus metrics with JavaScript collectors, structured logging
+
+### Development Principles
+- **Language Consistency**: JavaScript/TypeScript across all system components
+- **Type Safety**: Comprehensive TypeScript usage with strict configuration
+- **Modern Standards**: ES2022+ features, latest Node.js LTS versions
+- **Package Management**: npm/yarn with lockfiles for reproducible builds
 
 ## 📱 User Interface
 

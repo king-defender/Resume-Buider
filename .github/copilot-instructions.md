@@ -33,11 +33,18 @@ Always reference these instructions first and fallback to search or bash command
 
 ## Project Architecture (Planned)
 
-### Technology Stack
+### JavaScript-First Technology Principle
+- **Unified Language Stack**: JavaScript/TypeScript across all system components
+- **Default Choice**: Always evaluate JavaScript solutions first for new modules
+- **Exception Policy**: Non-JavaScript technologies only when they provide demonstrable superior value
+- **Integration Pattern**: Non-JS services must provide REST/GraphQL APIs for seamless integration
+
+### Technology Stack (JavaScript-First)
 - **Frontend**: React with TypeScript, Material-UI or Chakra UI
-- **Backend**: Node.js with Express.js or FastAPI
-- **Database**: PostgreSQL for user data, Redis for caching
-- **AI Integration**: ChatGPT, GitHub Copilot, Notion AI, Replit, LangChain, Autogen, Grok, Perplexity
+- **Backend**: Node.js with Express.js or Fastify (JavaScript-first approach)
+- **Database**: PostgreSQL with Prisma/TypeORM, Redis for caching
+- **Document Processing**: docx.js, pdf-lib, mammoth.js for file handling
+- **AI Integration**: ChatGPT, GitHub Copilot, Notion AI, Replit, LangChain.js, Autogen, Grok, Perplexity
 - **Deployment**: Docker-first with Kubernetes scaling options
 - **Storage**: S3-compatible for documents, CDN for static assets
 
