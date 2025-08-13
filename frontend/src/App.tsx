@@ -9,10 +9,11 @@ import {
   Box,
 } from '@chakra-ui/react';
 import { SimpleResumeAnalyzer } from './components/SimpleResumeAnalyzer';
+import { AnalysisResult } from './types';
 
 function App() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [analysisResult, setAnalysisResult] = useState(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f7fafc' }}>

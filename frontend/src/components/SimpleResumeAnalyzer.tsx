@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -53,14 +53,7 @@ export const SimpleResumeAnalyzer: React.FC<Props> = ({
   
   const toast = useToast();
 
-  useEffect(() => {
-    if (isOpen) {
-      loadAIServices();
-      resetForm();
-    }
-  }, [isOpen]);
-
-  const loadAIServices = async () => {
+  const loadAIServices = useCallback(async () => {
     try {
       const { services } = await aiApi.getServices();
       setAiServices(services);
@@ -80,7 +73,14 @@ export const SimpleResumeAnalyzer: React.FC<Props> = ({
         isClosable: true,
       });
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadAIServices();
+      resetForm();
+    }
+  }, [isOpen, loadAIServices]);
 
   const resetForm = () => {
     setResumeText('');
