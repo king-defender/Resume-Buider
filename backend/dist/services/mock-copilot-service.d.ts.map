@@ -1,0 +1,1 @@
+{"version":3,"file":"mock-copilot-service.d.ts","sourceRoot":"","sources":["../../src/services/mock-copilot-service.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,cAAc,EAAE,MAAM,SAAS,CAAC;AAEpD,qBAAa,kBAAmB,YAAW,SAAS;IAClD,IAAI,SAA2B;IAE/B,WAAW,IAAI,OAAO;IAIhB,OAAO,CAAC,aAAa,EAAE,MAAM,EAAE,cAAc,EAAE,MAAM,GAAG,OAAO,CAAC,cAAc,CAAC;IAuCrF,OAAO,CAAC,kBAAkB;CAI3B"}
