@@ -27,6 +27,10 @@ import {
   AlertIcon,
   Progress,
 } from '@chakra-ui/react';
+import { AnalysisResult, AIService } from '../types';
+import { FileUploadZone } from './FileUploadZone';
+import { AnalysisResults } from './AnalysisResults';
+import { aiApi } from '../utils/api';
 
 interface Props {
   isOpen: boolean;
