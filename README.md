@@ -67,6 +67,79 @@ npm start
 - By default, the frontend runs at [http://localhost:3000](http://localhost:3000)
 - The backend API runs at [http://localhost:5000](http://localhost:5000) (or as specified in your `.env`)
 
+## 🐳 Docker Setup (Recommended)
+
+For simplified development and deployment, use Docker to run both frontend and backend services:
+
+### Prerequisites
+
+- Docker Desktop or Docker Engine
+- Docker Compose
+
+### 1. Quick Start with Docker
+
+```bash
+# Clone the repository
+git clone https://github.com/king-defender/Resume-Buider.git
+cd Resume-Buider
+
+# Start all services with Docker Compose
+docker compose up --build
+```
+
+### 2. Service URLs
+
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: [http://localhost:3001](http://localhost:3001)
+
+### 3. Environment Configuration
+
+Create environment files with your API keys:
+
+```bash
+# Backend environment
+cp backend/.env.example backend/.env
+# Edit backend/.env with your OpenAI API key and other settings
+
+# Frontend environment (if needed)
+# Edit frontend/.env with API endpoint configurations
+```
+
+### 4. Docker Commands
+
+```bash
+# Start services in detached mode
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop services
+docker compose down
+
+# Rebuild and restart
+docker compose up --build
+
+# View running containers
+docker compose ps
+```
+
+### 5. Development with Docker
+
+For development, the Docker setup includes:
+- **Hot reload**: Code changes are reflected automatically
+- **Persistent storage**: Uploaded files are stored in Docker volumes
+- **Network isolation**: Services communicate through internal Docker network
+- **Port forwarding**: Access services from your host machine
+
+### Docker Configuration
+
+The Docker setup includes:
+- **Backend**: Node.js with multi-stage build for optimized production images
+- **Frontend**: React build served with nginx for optimal performance
+- **Networking**: Isolated Docker network for secure service communication
+- **Volumes**: Persistent storage for uploads and data
+
 ## 📁 Documentation Structure
 
 - [**System Architecture**](SYSTEM_ARCHITECTURE.md) - Technical specifications and AI integrations
