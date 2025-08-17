@@ -22,16 +22,70 @@ The AI-Powered Resume Builder is a comprehensive system designed to analyze job 
 
 - Node.js (v16+ recommended)
 - npm (v8+ recommended)
-- (Optional) Docker for containerized deployment
+- Docker and Docker Compose (for containerized deployment)
 
-### 1. Clone the repository
+### Option 1: Docker Deployment (Recommended)
+
+#### 1. Clone the repository
 
 ```bash
 git clone https://github.com/king-defender/Resume-Buider.git
 cd Resume-Buider
 ```
 
-### 2. Install dependencies
+#### 2. Setup environment variables
+
+```bash
+# Copy and configure backend environment variables
+cp backend/.env.example backend/.env
+# Edit backend/.env with your API keys (OpenAI, etc.)
+```
+
+#### 3. Build and run with Docker
+
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Or run in detached mode
+docker-compose up --build -d
+```
+
+#### 4. Access the application
+
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- Backend API: [http://localhost:3001/api](http://localhost:3001/api)
+- Health check: [http://localhost:3001/api/health](http://localhost:3001/api/health)
+
+#### 5. Docker management commands
+
+```bash
+# Stop all services
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Rebuild specific service
+docker-compose up --build backend
+docker-compose up --build frontend
+
+# Clean up (remove containers, networks, and volumes)
+docker-compose down -v --remove-orphans
+```
+
+### Option 2: Manual Development Setup
+
+#### 1. Clone the repository
+
+```bash
+git clone https://github.com/king-defender/Resume-Buider.git
+cd Resume-Buider
+```
+
+#### 2. Install dependencies
+
+#### 2. Install dependencies
 
 ```bash
 cd backend
@@ -41,12 +95,12 @@ cd ../frontend
 npm install
 ```
 
-### 3. Setup environment variables
+#### 3. Setup environment variables
 
 - Copy `.env.example` to `.env` in the relevant directories (backend, frontend)
 - Add your API keys (OpenAI, Notion, etc.) and other secrets.
 
-### 4. Run the backend server
+#### 4. Run the backend server
 
 ```bash
 cd backend
@@ -55,14 +109,14 @@ npm start
 npm run dev
 ```
 
-### 5. Run the frontend (if applicable)
+#### 5. Run the frontend (if applicable)
 
 ```bash
 cd frontend
 npm start
 ```
 
-### 6. Access the app
+#### 6. Access the app
 
 - By default, the frontend runs at [http://localhost:3000](http://localhost:3000)
 - The backend API runs at [http://localhost:5000](http://localhost:5000) (or as specified in your `.env`)
